@@ -1,0 +1,7 @@
+activate .
+
+add DataFrames, CSV, LinearAlgebra, DelimitedFiles, Makie, AbstractPlotting, GLFW, MakieLayout, ProgressMeter, IJulia
+build Compat
+build IJulia
+build Makie
+

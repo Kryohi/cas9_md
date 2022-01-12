@@ -1,0 +1,58 @@
+check pdb remarks
+propka (check istidine, arginine...)
+-> pdb con label corrette di protonazione per proteina (senza idrogeni aggiunti da propka)
+
+.gro con idrogeni da pdb2gmx, con amber_cufix_fixlorenzo.ff 
+    [gmx pdb2gmx -f 5y36fromPDB2PQR_noH.pdb -o 5Y36_hydrogen.gro -p 5Y36_hydrogen.top -v -water tip3p]
+
+dodecahedron box padding 1.5nm
+    [gmx editconf -f 5Y36_hydrogen.gro -c -princ -d 1.5 -bt dodecahedron -o 5Y36_box.gro]
+    
+acqua tip3p
+    [gmx solvate -cp 5Y36_box.gro -p 5Y36_hydrogen.top -o 5Y36_water.gro]
+
+ions 150mM NaCl
+    [gmx grompp -f ions.mdp -c 5Y36_water.gro -p 5Y36_hydrogen.top -o ions.tpr]
+    [gmx genion -neutral -s ions.tpr -p 5Y36_hydrogen.top -conc 0.15 -pname NA -nname CL -o 5Y36_salted.gro]
+
+5000 min
+    [gmx grompp -f minim.mdp -c ../00-external/5Y36_salted.gro -p ../00-external/5Y36_salted.top -o minimization.tpr
+    gmx mdrun -v -deffnm minimization]
+    
+creare file ndx (
+
+NVT acqua 300K 0.5ns + controllo
+    [gmx grompp -f 02-eq/nvt_fix.mdp -c 01-min/minimization.gro -n 00-external/5Y36_salted.ndx -r 01-min/minimization.gro -p 00-external/5Y36_salted.top -o 02-eq/nvt_fix.tpr]
+trjconv -pbc (raggruppare tutto per cdm) per visualizzare cose
+    [gmx trjconv -f cas9_nvt_nojump.trr -n ../00-external/5Y36_salted.ndx -s nvt_fix.tpr -fit rot+trans -o cas9_nvt_nojump2.trr]
+
+# check refcoord, check migliori parametri per termostato/barostato
+NPT ~5ns con vincoli (walltime 9ore)
+    [gmx grompp -f 03-eqnpt/npt_fix.mdp -c 02-eqnvt/cas9_nvt.gro -n 00-external/5Y36_salted.ndx -r 02-eqnvt/cas9_nvt.gro -p 00-external/5Y36_salted.top -t 02-eqnvt/cas9_nvt.cpt -o 03-eqnpt/npt_fix.tpr]
+
+controllo termocose + concentrazione ionica attorno a cas
+save ogni ~50mus
+
+# script mdA per distribuzione ioni sodio intorno a dna e rna (capped_distances, partendo da 5A salendo se serve) (o ossigeni fosfati o fosforo)
+#grafico numero in funzione del tempo
+
+trjconv
+rmsd
+rmsd 2D
+
+# concatenare tutti i file xtc corretti (settime interattivo basta mettere c a tutti):
+    gmx trjcat -f cas9_prod_pbc*[0-9].xtc(n) -o cas9_prod_pbc_all.xtc --settime
+    
+# migliorare ulteriormente visualizzazione:
+    gmx trjconv -f cas9_prod_pbc_all.xtc -s ../00-external/5Y36_box.gro -pbc nojump -ur compact -o cas9_prod_nojump_all.xtc
+
+ssh glattanzi@renzo.physics.unitn.it
+PW >  Elv1s3nel_n1d0
+
+# per scaricare 10 traiettorie insieme
+scp -r 'glattanzi@renzo.physics.unitn.it:/home/glattanzi/fabio.mazza/cas9_md/data/04-prod/cas9_prod_pbc2*[0-9].xtc' /home/kryohi/Uni/Tesi/cas9_md/data/04-prod
+
+# creazione ambiente
+conda create  --name mdanal MDAnalysis ipywidgets nglview tabulate
+conda activate mdanal
+python -m ipykernel install --user --name=mdanal

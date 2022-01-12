@@ -1,0 +1,58 @@
+;
+;	File '5Y36_hydrogen.top' was generated
+;	By user: kryohi (1000)
+;	On host: helmholtz
+;	At date: Wed Dec  1 12:23:20 2021
+;
+;	This is a standalone topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2021.4 (-:
+;	
+;	Executable:   /usr/local/gromacs/bin/gmx
+;	Data prefix:  /usr/local/gromacs
+;	Working dir:  /home/kryohi/Uni/Tesi/cas9_md/data/00-external
+;	Command line:
+;	  gmx pdb2gmx -f 5y36fromPDB2PQR_noH.pdb -o 5Y36_hydrogen.gro -p 5Y36_hydrogen.top -v -water tip3p
+;	Force field was read from current directory or a relative path - path added.
+;
+
+; Include forcefield parameters
+#include "./amber14sb_bsc1_cufix_lorenzo.ff/forcefield.itp"
+
+; Include chain topologies
+#include "5Y36_hydrogen_Protein_chain_A.itp"
+#include "5Y36_hydrogen_RNA_chain_B.itp"
+#include "5Y36_hydrogen_DNA_chain_C.itp"
+#include "5Y36_hydrogen_DNA_chain_D.itp"
+#include "5Y36_hydrogen_Ion_chain_A2.itp"
+#include "5Y36_hydrogen_Ion_chain_D2.itp"
+
+; Include water topology
+#include "./amber14sb_bsc1_cufix_lorenzo.ff/tip3p.itp"
+
+#ifdef POSRES_WATER
+; Position restraint for each water oxygen
+[ position_restraints ]
+;  i funct       fcx        fcy        fcz
+   1    1       1000       1000       1000
+#endif
+
+; Include topology for ions
+#include "./amber14sb_bsc1_cufix_lorenzo.ff/ions.itp"
+
+[ system ]
+; Name
+Protein in water
+
+[ molecules ]
+; Compound        #mols
+Protein_chain_A     1
+RNA_chain_B         1
+DNA_chain_C         1
+DNA_chain_D         1
+Ion_chain_A2        1
+Ion_chain_D2        1
+SOL         133574
+NA               549
+CL               398

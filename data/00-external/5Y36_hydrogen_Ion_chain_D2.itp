@@ -1,0 +1,33 @@
+;
+;	File '5Y36_hydrogen_Ion_chain_D2.itp' was generated
+;	By user: kryohi (1000)
+;	On host: helmholtz
+;	At date: Wed Dec  1 12:29:23 2021
+;
+;	This is a include topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2021.4 (-:
+;	
+;	Executable:   /usr/local/gromacs/bin/gmx
+;	Data prefix:  /usr/local/gromacs
+;	Working dir:  /home/kryohi/Uni/Tesi/cas9_md/data/00-external
+;	Command line:
+;	  gmx pdb2gmx -f 5y36fromPDB2PQR_noH.pdb -o 5Y36_hydrogen.gro -p 5Y36_hydrogen.top -v -water tip3p
+;	Force field was read from current directory or a relative path - path added.
+;
+
+[ moleculetype ]
+; Name            nrexcl
+Ion_chain_D2        3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass  typeB    chargeB      massB
+; residue 101 MG  rtp MG   q +2.0
+     1         MG    101     MG     MG      1          2     24.305   ; qtot 2
+
+; Include Position restraint file
+#ifdef POSRES
+#include "posre_Ion_chain_D2.itp"
+#endif
+

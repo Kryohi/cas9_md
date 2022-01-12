@@ -1,0 +1,14 @@
+name: mdanal
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - mdanalysis=2.0.0=py39he80948d_1
+  - ipykernel
+  - ipython_genutils
+  - tabulate
+  - ipywidgets
+  - nglview
+  - moviepy
+  - jupyterlab
+prefix: /home/kryohi/.miniconda3/envs/mdanal
